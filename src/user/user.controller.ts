@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { Body, HttpCode, Param, UsePipes } from '@nestjs/common/decorators';
 import { ValidationPipe } from '@nestjs/common/pipes';
+import { IdValidationPipe } from 'src/pipes/id-validation.pipe';
 
 import { CreateUserDto } from './dto/createUser.dto';
 import { USER_NOT_FOUND } from './user.constants';
