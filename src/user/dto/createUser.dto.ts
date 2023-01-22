@@ -1,6 +1,13 @@
-import { IsString, IsEmail, MaxLength, MinLength } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  MaxLength,
+  MinLength,
+  IsBoolean,
+} from 'class-validator';
 
 export class CreateUserDto {
+  // @IsString()
   userId: string;
 
   @MaxLength(40, { message: 'Допустимое количество символов от 10 до 40.' })
@@ -25,4 +32,7 @@ export class CreateUserDto {
   @MinLength(6)
   @IsString()
   password2: string;
+
+  // @IsBoolean()
+  confirmed: boolean;
 }

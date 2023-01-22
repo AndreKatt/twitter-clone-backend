@@ -26,8 +26,8 @@ export class UserService {
       sendEmail({
         emailFrom: 'admin@twitter.com',
         emailTo: dto.email,
-        subject: 'Подтверждение почты TwitterClone',
-        html: `Для того чтобы подтвердить почту, перейдите <a href="http://localhost:${process.env.PORT}/signup/verify?hash=${confirmHash}">по этой ссылке</a>`,
+        subject: 'Подтверждение почты Twitter Clone',
+        html: `Для того чтобы подтвердить почту, перейдите <a href="http://localhost:${process.env.PORT}/api/user/verify?hash=${confirmHash}">по этой ссылке</a>`,
       });
 
       return this.userModel.create({ ...dto, confirmHash });
@@ -36,6 +36,10 @@ export class UserService {
 
   async findUserById(userId: string): Promise<DocumentType<UserModel> | null> {
     return this.userModel.findById(userId).exec();
+  }
+
+  async verifyUserByHash(hash: string) {
+    return this.userModel.updateOne({ confirmHash: hash, confirmed: true });
   }
 
   async delete(id: string): Promise<DocumentType<UserModel> | null> {
