@@ -1,5 +1,5 @@
-import { prop } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
+import { prop } from '@typegoose/typegoose';
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 
 export interface UserModel extends Base {}
@@ -16,13 +16,13 @@ export class UserModel extends TimeStamps {
   @prop({ unique: true, required: true })
   username: string;
 
-  @prop({ unique: true, required: true })
+  @prop({ unique: true, required: true, select: false })
   password: string;
 
-  @prop({ required: true })
+  @prop({ required: true, select: false })
   password2: string;
 
-  @prop({ required: true })
+  @prop({ required: true, select: false })
   confirmHash: string;
 
   @prop({ default: false })

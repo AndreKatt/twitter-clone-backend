@@ -1,13 +1,9 @@
-import {
-  IsString,
-  IsEmail,
-  MaxLength,
-  MinLength,
-  IsBoolean,
-} from 'class-validator';
+import { Types } from 'mongoose';
+import { Type } from 'class-transformer';
+import { IsString, IsEmail, MaxLength, MinLength } from 'class-validator';
 
 export class CreateUserDto {
-  // @IsString()
+  @Type(() => Types.ObjectId)
   userId: string;
 
   @MaxLength(40, { message: 'Допустимое количество символов от 10 до 40.' })

@@ -5,7 +5,6 @@ import {
   Delete,
   HttpException,
   HttpStatus,
-  BadRequestException,
 } from '@nestjs/common';
 import {
   Body,
@@ -15,14 +14,11 @@ import {
   UsePipes,
 } from '@nestjs/common/decorators';
 import { ValidationPipe } from '@nestjs/common/pipes';
-import { query } from 'express';
-import { IdValidationPipe } from 'src/pipes/id-validation.pipe';
-import { generateMD5 } from 'src/utils/generateHash';
 
-import { CreateUserDto } from './dto/createUser.dto';
-import { sendEmail } from './sendMail';
-import { PASSWORDS_ARE_NOT_EQUAL, USER_NOT_FOUND } from './user.constants';
 import { UserService } from './user.service';
+import { USER_NOT_FOUND } from './user.constants';
+import { CreateUserDto } from './dto/createUser.dto';
+import { LoginUserDto } from './dto/loginUser.dto';
 
 @Controller('user')
 export class UserController {
@@ -34,14 +30,16 @@ export class UserController {
   }
 
   @UsePipes(new ValidationPipe())
-  @Post('create')
+  @Post('register')
   async create(@Body() dto: CreateUserDto) {
     return this.userService.create(dto);
   }
 
   @HttpCode(200)
   @Post('login')
-  async login(@Body() dto: CreateUserDto) {}
+  async login(@Body() dto: LoginUserDto) {
+    return this.userService.loginUser(dto);
+  }
 
   @Get('verify')
   async verify(@Query('hash') hash: string) {

@@ -4,8 +4,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { UserModule } from './user/user.module';
 import { TweetModule } from './tweet/tweet.module';
-import { MediaModule } from './media/media.module';
 import { getMongoConfig } from './configs/mongo.config';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
