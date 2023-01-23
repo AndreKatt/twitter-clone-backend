@@ -12,6 +12,7 @@ import {
   USER_UNAUTHORIZED,
   PASSWORDS_ARE_NOT_EQUAL,
 } from './user.constants';
+import { genSalt, hash, compare } from 'bcryptjs';
 
 @Injectable()
 export class UserService {
@@ -28,19 +29,28 @@ export class UserService {
       throw new BadRequestException(PASSWORDS_ARE_NOT_EQUAL);
     } else {
       const confirmHash = generateMD5(Math.random().toString());
+      const salt = await genSalt(10);
+      const newUser = new this.userModel({
+        email: dto.email,
+        username: dto.username,
+        fullname: dto.fullname,
+        passwordHash: await hash(dto.password, salt),
+        confirmHash: confirmHash,
+      });
       sendEmail({
         emailFrom: 'admin@twitter.com',
         emailTo: dto.email,
         subject: 'Подтверждение почты Twitter Clone',
         html: `Для того чтобы подтвердить почту, перейдите <a href="http://localhost:${process.env.PORT}/api/user/verify?hash=${confirmHash}">по этой ссылке</a>`,
       });
-
-      return this.userModel.create({ ...dto, confirmHash });
+      return newUser.save();
     }
   }
 
-  async findUserById(userId: string): Promise<DocumentType<UserModel> | null> {
-    return this.userModel.findById(userId).exec();
+  async findUserByEmail(
+    email: string,
+  ): Promise<DocumentType<UserModel> | null> {
+    return this.userModel.findOne({ email: email }).exec();
   }
 
   async verifyUserByHash(
@@ -57,20 +67,12 @@ export class UserService {
       .exec();
     if (!user) {
       throw new BadRequestException(USER_UNAUTHORIZED);
-    } else {
-      const pass: any = [];
-      await this.userModel
-        .findOne({ email: email })
-        .select('+password')
-        .then((params) => {
-          pass.push(params?.password);
-        });
-      if (password !== pass[0]) {
-        throw new BadRequestException(WRONG_PASSWORD);
-      } else {
-        return this.userModel.findOne({ email: email });
-      }
     }
+    const correctPassword = await compare(password, user.passwordHash);
+    if (!correctPassword) {
+      throw new BadRequestException(WRONG_PASSWORD);
+    }
+    return this.userModel.findOne({ email: email });
   }
 
   async delete(id: string): Promise<DocumentType<UserModel> | null> {

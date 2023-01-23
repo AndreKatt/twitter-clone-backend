@@ -17,10 +17,7 @@ export class UserModel extends TimeStamps {
   username: string;
 
   @prop({ unique: true, required: true, select: false })
-  password: string;
-
-  @prop({ required: true, select: false })
-  password2: string;
+  passwordHash: string;
 
   @prop({ required: true, select: false })
   confirmHash: string;
