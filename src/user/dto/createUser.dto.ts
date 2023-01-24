@@ -1,6 +1,13 @@
 import { Types } from 'mongoose';
 import { Type } from 'class-transformer';
-import { IsString, IsEmail, MaxLength, MinLength } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  MaxLength,
+  MinLength,
+  IsBoolean,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateUserDto {
   @Type(() => Types.ObjectId)
@@ -29,6 +36,7 @@ export class CreateUserDto {
   @IsString()
   password2: string;
 
-  // @IsBoolean()
+  @IsOptional()
+  @IsBoolean()
   confirmed: boolean;
 }

@@ -40,10 +40,12 @@ export class UserController {
     return this.userService.create(dto);
   }
 
+  @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Post('login')
   async login(@Body() dto: LoginUserDto) {
-    return this.userService.loginUser(dto);
+    await this.userService.loginUser(dto);
+    return this.userService.loginWithJWT(dto);
   }
 
   @Get('verify')
