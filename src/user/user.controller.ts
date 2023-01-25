@@ -11,15 +11,17 @@ import {
   HttpCode,
   Param,
   Query,
+  UseGuards,
   UsePipes,
 } from '@nestjs/common/decorators';
 import { ValidationPipe } from '@nestjs/common/pipes';
+import { BadRequestException } from '@nestjs/common/exceptions';
 
-import { UserService } from './user.service';
 import { ALREADY_REGISTERED_ERROR, USER_NOT_FOUND } from './user.constants';
 import { CreateUserDto } from './dto/createUser.dto';
 import { LoginUserDto } from './dto/loginUser.dto';
-import { BadRequestException } from '@nestjs/common/exceptions';
+import { JwtAuthGuard } from './guards/jwt.guard';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
@@ -50,17 +52,26 @@ export class UserController {
 
   @Get('verify')
   async verify(@Query('hash') hash: string) {
-    return this.userService.verifyUserByHash(hash);
+    const verifyUser = await this.userService.verifyUserByHash(hash);
+    if (!verifyUser) {
+      throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+    return verifyUser;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('byUser/:email')
   async getUserByEmail(@Param('email') email: string) {
-    return this.userService.findUserByEmail(email);
+    const findUser = await this.userService.findUserByEmail(email);
+    if (!findUser) {
+      throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+    return findUser;
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
-    const deletedUser = this.userService.delete(id);
+    const deletedUser = await this.userService.delete(id);
     if (!deletedUser) {
       throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }

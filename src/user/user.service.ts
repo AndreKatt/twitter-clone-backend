@@ -1,21 +1,20 @@
 import { InjectModel } from 'nestjs-typegoose';
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { ModelType, DocumentType } from '@typegoose/typegoose/lib/types';
-import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { genSalt, hash, compare } from 'bcryptjs';
+import { JwtService } from '@nestjs/jwt/dist/jwt.service';
+import { UnauthorizedException } from '@nestjs/common/exceptions';
+import { ModelType, DocumentType } from '@typegoose/typegoose/lib/types';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { sendEmail } from './sendMail';
-import { UserModel } from './user.model';
-import { LoginUserDto } from './dto/loginUser.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { generateMD5 } from '../utils/generateHash';
+import { LoginUserDto } from './dto/loginUser.dto';
+import { UserModel } from './user.model';
+import { sendEmail } from './sendMail';
 import {
   WRONG_PASSWORD,
   USER_UNAUTHORIZED,
   PASSWORDS_ARE_NOT_EQUAL,
 } from './user.constants';
-import { NullLiteral } from 'typescript';
-import { UnauthorizedException } from '@nestjs/common/exceptions';
 
 @Injectable()
 export class UserService {
@@ -29,7 +28,6 @@ export class UserService {
   }
 
   async create(dto: CreateUserDto): Promise<DocumentType<UserModel>> {
-    console.log(dto.password, dto.password2);
     if (dto.password !== dto.password2) {
       throw new BadRequestException(PASSWORDS_ARE_NOT_EQUAL);
     } else {
@@ -78,14 +76,16 @@ export class UserService {
     if (!correctPassword) {
       throw new UnauthorizedException(WRONG_PASSWORD);
     }
-    return this.userModel.findOne({ email: email } || { username: username });
+    return this.userModel.findOne(
+      { email: user.email } || { username: username },
+    );
   }
 
   async loginWithJWT(dto: LoginUserDto) {
-    const { email, username } = dto;
-    const payload = email || username;
+    const { email } = dto;
+    const payload = { email };
     return {
-      token: await this.jwtService.signAsync(payload),
+      access_token: await this.jwtService.signAsync(dto),
     };
   }
 
