@@ -1,12 +1,13 @@
 import { NotFoundException } from '@nestjs/common/exceptions';
-import { Controller, Get, Post, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Patch } from '@nestjs/common';
 import { Body, Param, UseGuards } from '@nestjs/common/decorators';
 
-import { CurrentUserEmail } from '../decorators/user-email.decorator';
-import { JwtAuthGuard } from '../user/guards/jwt.guard';
+import { CurrentUserEmail } from 'src/decorators/user-email.decorator';
+import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { CreateTweetDto } from './dto/createTweet.dto';
 import { TWEET_NOT_FOUD } from './tweet.constants';
 import { TweetService } from './tweet.service';
+import { CurrentUsername } from 'src/decorators/user-username.decorator copy';
 
 @Controller('tweets')
 export class TweetController {
@@ -33,11 +34,39 @@ export class TweetController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  async delete(@Param('id') id: string, @CurrentUserEmail() email: string) {
-    const deleteTweet = await this.tweetService.delete(id, email);
-    if (!deleteTweet) {
+  @Patch('update/:id')
+  async update(
+    @Param('id') id: string,
+    @CurrentUserEmail() email: string,
+    @CurrentUsername() username: string,
+    @Body() dto: CreateTweetDto,
+  ) {
+    const verifyAndFindEmail = await this.tweetService.verify(
+      id,
+      email,
+      username,
+    );
+    if (!verifyAndFindEmail) {
       throw new NotFoundException(TWEET_NOT_FOUD);
     }
+    const updated = this.tweetService.update(id, dto);
+    if (!updated) {
+      throw new NotFoundException(TWEET_NOT_FOUD);
+    }
+    return updated;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async delete(
+    @Param('id') id: string,
+    @CurrentUserEmail() email: string,
+    @CurrentUsername() username: string,
+  ) {
+    const verify = await this.tweetService.verify(id, email, username);
+    if (!verify) {
+      throw new NotFoundException(TWEET_NOT_FOUD);
+    }
+    return this.tweetService.delete(id);
   }
 }

@@ -82,8 +82,6 @@ export class UserService {
   }
 
   async loginWithJWT(dto: LoginUserDto) {
-    const { email } = dto;
-    const payload = { email };
     return {
       access_token: await this.jwtService.signAsync(dto),
     };

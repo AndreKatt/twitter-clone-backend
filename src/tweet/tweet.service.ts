@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { FORBIDDEN_USER_EXCRPTION } from './tweet.constants';
 import { CreateTweetDto } from './dto/createTweet.dto';
 import { TweetModel } from './tweet.model';
+import { UpdateWriteOpResult } from 'mongoose';
 
 @Injectable()
 export class TweetService {
@@ -27,12 +28,32 @@ export class TweetService {
     return this.tweetModel.create(dto);
   }
 
-  async delete(id: string, email: string) {
+  async update(id: string, dto: CreateTweetDto) {
+    return this.tweetModel.findByIdAndUpdate(id, dto, { new: true }).exec();
+  }
+
+  async verify(
+    id: string,
+    email: string,
+    username: string,
+  ): Promise<DocumentType<TweetModel> | null> {
     const tweet = await this.findTweetById(id);
-    const currentEmail = tweet?.user.email;
-    if (email !== currentEmail) {
-      throw new ForbiddenException(FORBIDDEN_USER_EXCRPTION);
+    const tweetEmail = tweet?.user.email;
+    const tweetUsername = tweet?.user.username;
+    if (email) {
+      if (email !== tweetEmail) {
+        throw new ForbiddenException(FORBIDDEN_USER_EXCRPTION);
+      }
     }
-    return this.tweetModel.findByIdAndDelete(id).exec();
+    if (username) {
+      if (username !== tweetUsername) {
+        throw new ForbiddenException(FORBIDDEN_USER_EXCRPTION);
+      }
+    }
+    return tweet;
+  }
+
+  async delete(id: string) {
+    this.tweetModel.findByIdAndDelete(id).exec();
   }
 }

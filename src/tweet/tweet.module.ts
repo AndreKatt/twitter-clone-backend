@@ -8,6 +8,7 @@ import { getJWTConfig } from '../configs/jwt.config';
 import { TweetController } from './tweet.controller';
 import { TweetService } from './tweet.service';
 import { TweetModel } from './tweet.model';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   controllers: [TweetController],
@@ -26,6 +27,7 @@ import { TweetModel } from './tweet.model';
       inject: [ConfigService],
       useFactory: getJWTConfig,
     }),
+    PassportModule,
   ],
   providers: [TweetService, JwtStrategy],
 })
