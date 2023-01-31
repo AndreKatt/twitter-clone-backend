@@ -2,7 +2,11 @@ import { InjectModel } from 'nestjs-typegoose';
 import { genSalt, hash, compare } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { UnauthorizedException } from '@nestjs/common/exceptions';
-import { ModelType, DocumentType } from '@typegoose/typegoose/lib/types';
+import {
+  ModelType,
+  DocumentType,
+  BeAnObject,
+} from '@typegoose/typegoose/lib/types';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { CreateUserDto } from './dto/createUser.dto';
@@ -15,6 +19,7 @@ import {
   USER_UNAUTHORIZED,
   PASSWORDS_ARE_NOT_EQUAL,
 } from './user.constants';
+import { CurrentUserDto } from './dto/currentUser.dto';
 
 @Injectable()
 export class UserService {
@@ -81,10 +86,19 @@ export class UserService {
     );
   }
 
-  async loginWithJWT(dto: LoginUserDto) {
+  async loginWithJWT(email: string, username: string, fullname: string) {
+    const tokenData = { email, username, fullname };
     return {
-      access_token: await this.jwtService.signAsync(dto),
+      access_token: await this.jwtService.signAsync(tokenData),
     };
+  }
+
+  async getCurrentUser(
+    email: string,
+    username: string,
+    fullname: string,
+  ): Promise<CurrentUserDto> {
+    return { email: email, username: username, fullname: fullname };
   }
 
   async delete(id: string): Promise<DocumentType<UserModel> | null> {

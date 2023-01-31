@@ -17,7 +17,7 @@ export class TweetService {
   ) {}
 
   async index(): Promise<DocumentType<TweetModel>[]> {
-    return this.tweetModel.find({}).exec();
+    return this.tweetModel.find({}).sort({ createdAt: -1 }).exec();
   }
 
   async findTweetById(id: string): Promise<DocumentType<TweetModel> | null> {
