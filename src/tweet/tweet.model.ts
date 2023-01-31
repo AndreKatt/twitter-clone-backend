@@ -8,6 +8,9 @@ class TweetUser {
 
   @prop({ required: true })
   username: string;
+
+  @prop({ required: true })
+  fullname: string;
 }
 
 export interface TweetModel extends Base {}

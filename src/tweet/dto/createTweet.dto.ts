@@ -8,6 +8,9 @@ class TweetUserDto {
 
   @IsString()
   username: string;
+
+  @IsString()
+  fullname: string;
 }
 
 export class CreateTweetDto {

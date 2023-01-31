@@ -18,6 +18,7 @@ import {
   WRONG_PASSWORD,
   USER_UNAUTHORIZED,
   PASSWORDS_ARE_NOT_EQUAL,
+  UNCONFIRMED_PROFILE,
 } from './user.constants';
 import { CurrentUserDto } from './dto/currentUser.dto';
 
@@ -49,7 +50,7 @@ export class UserService {
         emailFrom: 'admin@twitter.com',
         emailTo: dto.email,
         subject: 'Подтверждение почты Twitter Clone',
-        html: `Для того чтобы подтвердить почту, перейдите <a href="http://localhost:${process.env.PORT}/api/user/verify?hash=${confirmHash}">по этой ссылке</a>`,
+        html: `Для того чтобы подтвердить почту, перейдите <a href="http://localhost:${process.env.PROXY}/api/user/verify?hash=${confirmHash}">по этой ссылке</a>`,
       });
       return newUser.save();
     }
@@ -76,6 +77,9 @@ export class UserService {
       .exec();
     if (!user) {
       throw new UnauthorizedException(USER_UNAUTHORIZED);
+    }
+    if (!user.confirmed) {
+      throw new UnauthorizedException(UNCONFIRMED_PROFILE);
     }
     const correctPassword = await compare(password, user.passwordHash);
     if (!correctPassword) {
