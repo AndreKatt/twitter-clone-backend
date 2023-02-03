@@ -6,6 +6,7 @@ import { getMongoConfig } from './configs/mongo.config';
 import { TweetModule } from './tweet/tweet.module';
 import { MediaModule } from './media/media.module';
 import { UserModule } from './user/user.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     TweetModule,
     MediaModule,
+    FilesModule,
   ],
 })
 export class AppModule {}
