@@ -7,6 +7,7 @@ import { TweetModule } from './tweet/tweet.module';
 import { MediaModule } from './media/media.module';
 import { UserModule } from './user/user.module';
 import { FilesModule } from './files/files.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { FilesModule } from './files/files.module';
     TweetModule,
     MediaModule,
     FilesModule,
+    CloudinaryModule,
   ],
 })
 export class AppModule {}
