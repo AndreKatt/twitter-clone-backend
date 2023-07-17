@@ -27,6 +27,15 @@ export class TweetController {
     return findTweet;
   }
 
+  @Get('byEmail/:email')
+  async findByEmail(@Param('user.email') email: string) {
+    const findTweet = await this.tweetService.findTweetByEmail(email);
+    if (!findTweet) {
+      throw new NotFoundException(TWEET_NOT_FOUD);
+    }
+    return findTweet;
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post('addTweet')
   async create(@Body() dto: CreateTweetDto) {

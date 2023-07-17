@@ -11,7 +11,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ envFilePath: '.env' }),
     TypegooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

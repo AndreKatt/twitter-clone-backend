@@ -21,6 +21,9 @@ export class TweetModel extends TimeStamps {
   @prop({ required: true })
   text: string;
 
+  @prop()
+  images: string[];
+
   @prop({ required: true })
   user: TweetUser;
   // likes:

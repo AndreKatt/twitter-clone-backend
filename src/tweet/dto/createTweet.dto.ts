@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import { Type } from 'class-transformer';
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsString, MaxLength, MinLength } from 'class-validator';
 
 class TweetUserDto {
   @IsString()
@@ -21,6 +21,10 @@ export class CreateTweetDto {
   @MaxLength(280, { message: 'Максимальная длина 280 символов!' })
   @IsString()
   text: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  images?: string[];
 
   @Type(() => TweetUserDto)
   user: TweetUserDto;

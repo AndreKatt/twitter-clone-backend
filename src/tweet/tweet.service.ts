@@ -24,6 +24,15 @@ export class TweetService {
     return this.tweetModel.findById(id).exec();
   }
 
+  async findTweetByEmail(
+    email: string,
+  ): Promise<DocumentType<TweetModel>[] | null> {
+    return this.tweetModel
+      .find({ email: email })
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
   async create(dto: CreateTweetDto): Promise<DocumentType<TweetModel>> {
     return this.tweetModel.create(dto);
   }
