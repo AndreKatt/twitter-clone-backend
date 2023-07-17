@@ -8,6 +8,7 @@ import { CreateTweetDto } from './dto/createTweet.dto';
 import { TWEET_NOT_FOUD } from './tweet.constants';
 import { TweetService } from './tweet.service';
 import { CurrentUsername } from 'src/decorators/user-username.decorator copy';
+import { UserService } from 'src/user/user.service';
 
 @Controller('tweets')
 export class TweetController {
@@ -28,12 +29,12 @@ export class TweetController {
   }
 
   @Get('byEmail/:email')
-  async findByEmail(@Param('user.email') email: string) {
-    const findTweet = await this.tweetService.findTweetByEmail(email);
-    if (!findTweet) {
+  async findByEmail(@Param('email') email: string) {
+    const userTweets = await this.tweetService.findTweetByEmail(email);
+    if (!userTweets) {
       throw new NotFoundException(TWEET_NOT_FOUD);
     }
-    return findTweet;
+    return userTweets;
   }
 
   @UseGuards(JwtAuthGuard)

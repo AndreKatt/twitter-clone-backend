@@ -8,6 +8,7 @@ import { FORBIDDEN_USER_EXCRPTION } from './tweet.constants';
 import { CreateTweetDto } from './dto/createTweet.dto';
 import { TweetModel } from './tweet.model';
 import { UpdateWriteOpResult } from 'mongoose';
+import { UserModel } from 'src/user/user.model';
 
 @Injectable()
 export class TweetService {
@@ -27,10 +28,11 @@ export class TweetService {
   async findTweetByEmail(
     email: string,
   ): Promise<DocumentType<TweetModel>[] | null> {
-    return this.tweetModel
-      .find({ email: email })
-      .sort({ createdAt: -1 })
-      .exec();
+    const tweets = (await this.tweetModel.find({}).exec()).filter(
+      (tweet) => tweet.user.email === email,
+    );
+
+    return tweets;
   }
 
   async create(dto: CreateTweetDto): Promise<DocumentType<TweetModel>> {
