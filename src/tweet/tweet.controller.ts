@@ -8,7 +8,6 @@ import { CreateTweetDto } from './dto/createTweet.dto';
 import { TWEET_NOT_FOUD } from './tweet.constants';
 import { TweetService } from './tweet.service';
 import { CurrentUsername } from 'src/decorators/user-username.decorator copy';
-import { UserService } from 'src/user/user.service';
 
 @Controller('tweets')
 export class TweetController {

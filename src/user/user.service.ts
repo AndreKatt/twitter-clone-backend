@@ -1,13 +1,16 @@
 import { InjectModel } from 'nestjs-typegoose';
 import { genSalt, hash, compare } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
-import { UnauthorizedException } from '@nestjs/common/exceptions';
+import {
+  HttpException,
+  UnauthorizedException,
+} from '@nestjs/common/exceptions';
 import {
   ModelType,
   DocumentType,
   BeAnObject,
 } from '@typegoose/typegoose/lib/types';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { CreateUserDto } from './dto/createUser.dto';
 import { generateMD5 } from '../utils/generateHash';
@@ -19,6 +22,7 @@ import {
   USER_UNAUTHORIZED,
   PASSWORDS_ARE_NOT_EQUAL,
   UNCONFIRMED_PROFILE,
+  USER_NOT_FOUND,
 } from './user.constants';
 import { CurrentUserDto } from './dto/currentUser.dto';
 
@@ -103,6 +107,45 @@ export class UserService {
     fullname: string,
   ): Promise<CurrentUserDto> {
     return { email: email, username: username, fullname: fullname };
+  }
+
+  async findFollowing(email: string, id: string): Promise<boolean> {
+    const currentUser = await this.userModel.findById(id).exec();
+    return currentUser?.following.includes(email) ? true : false;
+  }
+
+  async addFollowing(
+    email: string,
+    id: string,
+  ): Promise<DocumentType<UserModel> | null> {
+    const currentUser = await this.userModel.findById(id).exec();
+    if (currentUser) {
+      return this.userModel
+        .findByIdAndUpdate(
+          id,
+          { following: [...currentUser.following, email] },
+          { new: true },
+        )
+        .exec();
+    } else {
+      throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async removeFollowing(
+    email: string,
+    id: string,
+  ): Promise<DocumentType<UserModel> | null> {
+    const user = await this.userModel.findById(id).exec();
+    if (user) {
+      const updatedFollowing = user.following.filter((acc) => acc !== email);
+
+      return this.userModel
+        .findByIdAndUpdate(id, { following: updatedFollowing }, { new: true })
+        .exec();
+    } else {
+      throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
   }
 
   async delete(id: string): Promise<DocumentType<UserModel> | null> {

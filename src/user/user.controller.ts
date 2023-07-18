@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Delete,
+  Patch,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
@@ -21,7 +22,9 @@ import {
 } from '@nestjs/common/exceptions';
 
 import {
+  ALREADY_FOLLOW_ERROR,
   ALREADY_REGISTERED_ERROR,
+  FOLLOWING_NOT_FOUND,
   USER_NOT_FOUND,
   USER_UNAUTHORIZED,
 } from './user.constants';
@@ -40,6 +43,26 @@ export class UserController {
   @Get('index')
   async index() {
     return this.userService.index();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('byUser/:email')
+  async getUserByEmail(@Param('email') email: string) {
+    const findUser = await this.userService.findUserByEmail(email);
+    if (!findUser) {
+      throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+    return findUser;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getCurrentUserData(
+    @CurrentUserEmail() email: string,
+    @CurrentUsername() username: string,
+    @CurrentUserFullname() fullname: string,
+  ) {
+    return this.userService.getCurrentUser(email, username, fullname);
   }
 
   @UsePipes(new ValidationPipe())
@@ -69,6 +92,28 @@ export class UserController {
     throw new UnauthorizedException(USER_UNAUTHORIZED);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('follow/:id')
+  async follow(@Param('id') id: string, @CurrentUserEmail() email: string) {
+    const alreadyFollow = await this.userService.findFollowing(email, id);
+    if (alreadyFollow) {
+      throw new BadRequestException(ALREADY_FOLLOW_ERROR);
+    } else {
+      return this.userService.addFollowing(email, id);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('unfollow/:id')
+  async unfollow(@Param('id') id: string, @CurrentUserEmail() email: string) {
+    const alreadyFollow = await this.userService.findFollowing(email, id);
+    if (alreadyFollow) {
+      return this.userService.removeFollowing(email, id);
+    } else {
+      throw new HttpException(FOLLOWING_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+  }
+
   @Get('verify')
   async verify(@Query('hash') hash: string) {
     const verifyUser = await this.userService.verifyUserByHash(hash);
@@ -76,26 +121,6 @@ export class UserController {
       throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
     return verifyUser;
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('byUser/:email')
-  async getUserByEmail(@Param('email') email: string) {
-    const findUser = await this.userService.findUserByEmail(email);
-    if (!findUser) {
-      throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-    }
-    return findUser;
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('me')
-  async getCurrentUserData(
-    @CurrentUserEmail() email: string,
-    @CurrentUsername() username: string,
-    @CurrentUserFullname() fullname: string,
-  ) {
-    return this.userService.getCurrentUser(email, username, fullname);
   }
 
   @Delete(':id')

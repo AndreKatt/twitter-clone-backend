@@ -25,6 +25,12 @@ export class UserModel extends TimeStamps {
   @prop({ default: false })
   confirmed: boolean;
 
+  @prop({ default: [] })
+  following: string[];
+
+  @prop({ default: [] })
+  followers: string[];
+
   // @prop()
   // location: string;
 
