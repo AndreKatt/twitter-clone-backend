@@ -95,20 +95,22 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Patch('follow/:id')
   async follow(@Param('id') id: string, @CurrentUserEmail() email: string) {
-    const alreadyFollow = await this.userService.findFollowing(email, id);
+    const alreadyFollow = await this.userService.findFollowing(id, email);
+
     if (alreadyFollow) {
       throw new BadRequestException(ALREADY_FOLLOW_ERROR);
     } else {
-      return this.userService.addFollowing(email, id);
+      return this.userService.subscribe(id, email);
     }
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('unfollow/:id')
   async unfollow(@Param('id') id: string, @CurrentUserEmail() email: string) {
-    const alreadyFollow = await this.userService.findFollowing(email, id);
+    const alreadyFollow = await this.userService.findFollowing(id, email);
+
     if (alreadyFollow) {
-      return this.userService.removeFollowing(email, id);
+      return this.userService.unSubscride(id, email);
     } else {
       throw new HttpException(FOLLOWING_NOT_FOUND, HttpStatus.NOT_FOUND);
     }

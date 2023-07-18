@@ -8,4 +8,5 @@ export const ALREADY_REGISTERED_ERROR =
   'Пользователь с таким e-mail уже существует!';
 export const ALREADY_FOLLOW_ERROR =
   'Пользователь уже подписан на этот аккаунт!';
-export const FOLLOWING_NOT_FOUND = 'Аккаунт с таким email не наден!';
+export const FOLLOWING_NOT_FOUND =
+  'Аккаунт с таким email не наден среди подписок!';
