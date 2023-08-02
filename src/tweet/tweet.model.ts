@@ -13,6 +13,14 @@ class TweetUser {
   fullname: string;
 }
 
+class Reply {
+  @prop({ required: true })
+  user: TweetUser;
+
+  @prop({ required: true })
+  text: string;
+}
+
 export interface TweetModel extends Base {}
 export class TweetModel extends TimeStamps {
   @prop()
@@ -26,7 +34,13 @@ export class TweetModel extends TimeStamps {
 
   @prop({ required: true })
   user: TweetUser;
-  // likes:
-  // retweets:
-  // replies:
+
+  @prop({ default: [] })
+  likes: TweetUser[];
+
+  @prop({ default: [] })
+  retweets: TweetUser[];
+
+  @prop({ default: [] })
+  replies: Reply[];
 }
