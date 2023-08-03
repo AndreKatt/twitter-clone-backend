@@ -36,10 +36,10 @@ export class TweetModel extends TimeStamps {
   user: TweetUser;
 
   @prop({ default: [] })
-  likes: TweetUser[];
+  likes: string[];
 
   @prop({ default: [] })
-  retweets: TweetUser[];
+  retweets: string[];
 
   @prop({ default: [] })
   replies: Reply[];

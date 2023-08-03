@@ -113,6 +113,7 @@ export class UserService {
   async findFollowing(id: string, email: string): Promise<boolean> {
     const currentUser = await this.findUserByEmail(email);
     const followedUser = await this.userModel.findById(id).exec();
+
     if (followedUser && currentUser) {
       return currentUser.following.includes(followedUser.email) ? true : false;
     } else {
@@ -120,58 +121,42 @@ export class UserService {
     }
   }
 
-  async updateFollowing(id: Types.ObjectId, following: string[]) {
+  async updateUserData(
+    id: Types.ObjectId,
+    type: 'following' | 'followers' | 'likes',
+    data: string[],
+  ) {
     return this.userModel
-      .findByIdAndUpdate(id, { following: following }, { new: true })
+      .findByIdAndUpdate(id, { [type]: data }, { new: true })
       .exec();
   }
 
-  async updateFollowers(id: Types.ObjectId, followers: string[]) {
-    return this.userModel
-      .findByIdAndUpdate(id, { followers: followers }, { new: true })
-      .exec();
-  }
-
-  async subscribe(
+  async changeSubscriptions(
     id: string,
+    type: 'subscribe' | 'unsubscribe',
     email: string,
   ): Promise<DocumentType<UserModel> | null> {
     const currentUser = await this.findUserByEmail(email);
-    const followedUser = await this.userModel.findById(id).exec();
+    const followingUser = await this.userModel.findById(id).exec();
 
-    if (currentUser && followedUser) {
-      this.updateFollowers(followedUser._id, [
-        ...followedUser.followers,
-        currentUser.email,
-      ]);
+    if (currentUser && followingUser) {
+      const updatedFollowing =
+        type === 'subscribe'
+          ? [...currentUser.following, followingUser.email]
+          : currentUser.following.filter((acc) => acc !== followingUser.email);
 
-      return this.updateFollowing(currentUser._id, [
-        ...currentUser.following,
-        followedUser.email,
-      ]);
-    } else {
-      throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-    }
-  }
+      const updatedFollowers =
+        type === 'subscribe'
+          ? [...followingUser.followers, currentUser.email]
+          : followingUser.followers.filter((acc) => acc !== email);
 
-  async unSubscride(
-    id: string,
-    email: string,
-  ): Promise<DocumentType<UserModel> | null> {
-    const currentUser = await this.findUserByEmail(email);
-    const followedUser = await this.userModel.findById(id).exec();
+      this.updateUserData(followingUser._id, 'followers', updatedFollowers);
 
-    if (currentUser && followedUser) {
-      const updatedFollowing = currentUser.following.filter(
-        (acc) => acc !== followedUser.email,
+      return this.updateUserData(
+        currentUser._id,
+        'following',
+        updatedFollowing,
       );
-      const updatedFollowers = followedUser.followers.filter(
-        (acc) => acc !== email,
-      );
-
-      this.updateFollowers(followedUser._id, updatedFollowers);
-
-      return this.updateFollowing(currentUser._id, updatedFollowing);
     } else {
       throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
@@ -179,5 +164,24 @@ export class UserService {
 
   async delete(id: string): Promise<DocumentType<UserModel> | null> {
     return this.userModel.findByIdAndDelete(id).exec();
+  }
+
+  async changeLikes(
+    tweetId: string,
+    type: 'like' | 'unlike',
+    email: string,
+  ): Promise<DocumentType<UserModel> | null> {
+    const user = await this.findUserByEmail(email);
+
+    if (user) {
+      const updatedLikes =
+        type === 'like'
+          ? [...user.likes, tweetId]
+          : user.likes.filter((id) => id !== tweetId);
+
+      return this.updateUserData(user.id, 'likes', updatedLikes);
+    } else {
+      throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
   }
 }

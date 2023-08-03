@@ -31,12 +31,12 @@ export class UserModel extends TimeStamps {
   @prop({ default: [] })
   followers: string[];
 
+  @prop({ default: [] })
+  likes: string[];
+
   // @prop()
   // location: string;
 
   // @prop()
   // about: string;
-
-  // @prop()
-  // website: string;
 }

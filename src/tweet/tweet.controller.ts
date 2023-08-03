@@ -1,17 +1,29 @@
-import { NotFoundException } from '@nestjs/common/exceptions';
+import {
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common/exceptions';
 import { Controller, Get, Post, Delete, Patch } from '@nestjs/common';
 import { Body, Param, UseGuards } from '@nestjs/common/decorators';
-
+// local libs
 import { CurrentUserEmail } from 'src/decorators/user-email.decorator';
 import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { CreateTweetDto } from './dto/createTweet.dto';
-import { TWEET_NOT_FOUD } from './tweet.constants';
+import {
+  ALREADY_LIKED_ERROR,
+  LIKE_NOT_FOUND,
+  TWEET_NOT_FOUD,
+} from './tweet.constants';
 import { TweetService } from './tweet.service';
 import { CurrentUsername } from 'src/decorators/user-username.decorator copy';
+import { CurrentUserDto } from 'src/user/dto/currentUser.dto';
+import { UserService } from 'src/user/user.service';
 
 @Controller('tweets')
 export class TweetController {
-  constructor(private readonly tweetService: TweetService) {}
+  constructor(
+    private readonly tweetService: TweetService,
+    private readonly userService: UserService,
+  ) {}
 
   @Get('index')
   async index() {
@@ -40,6 +52,48 @@ export class TweetController {
   @Post('addTweet')
   async create(@Body() dto: CreateTweetDto) {
     return this.tweetService.create(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('like/:id')
+  async like(@Param('id') id: string, @CurrentUserEmail() email: string) {
+    const alreadyLiked = await this.tweetService.findActionData(
+      id,
+      'likes',
+      email,
+    );
+
+    if (alreadyLiked) {
+      throw new BadRequestException(ALREADY_LIKED_ERROR);
+    } else {
+      await this.userService.changeLikes(id, 'like', email);
+
+      return this.tweetService.action(id, 'likes', email);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('unlike/:id')
+  async unlike(@Param('id') id: string, @CurrentUserEmail() email: string) {
+    const alreadyLiked = await this.tweetService.findActionData(
+      id,
+      'likes',
+      email,
+    );
+
+    if (alreadyLiked) {
+      await this.userService.changeLikes(id, 'unlike', email);
+
+      return await this.tweetService.action(id, 'likes', email, true);
+    } else {
+      throw new BadRequestException(LIKE_NOT_FOUND);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('retweet/:id')
+  async retweet(@Param('id') id: string, @CurrentUserEmail() email: string) {
+    return this.tweetService.action(id, 'retweets', email);
   }
 
   @UseGuards(JwtAuthGuard)

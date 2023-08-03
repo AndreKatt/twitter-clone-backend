@@ -10,8 +10,6 @@ import { TweetController } from './tweet.controller';
 import { TweetService } from './tweet.service';
 import { TweetModel } from './tweet.model';
 import { UserService } from '../user/user.service';
-import { UserModule } from '../user/user.module';
-import { UserModel } from 'src/user/user.model';
 
 @Module({
   controllers: [TweetController],
@@ -32,6 +30,6 @@ import { UserModel } from 'src/user/user.model';
     }),
     PassportModule,
   ],
-  providers: [TweetService, JwtStrategy],
+  providers: [TweetService, JwtStrategy, UserService],
 })
 export class TweetModule {}
