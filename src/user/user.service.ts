@@ -162,10 +162,6 @@ export class UserService {
     }
   }
 
-  async delete(id: string): Promise<DocumentType<UserModel> | null> {
-    return this.userModel.findByIdAndDelete(id).exec();
-  }
-
   async changeLikes(
     tweetId: string,
     type: 'like' | 'unlike',
@@ -183,5 +179,9 @@ export class UserService {
     } else {
       throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
+  }
+
+  async delete(id: string): Promise<DocumentType<UserModel> | null> {
+    return this.userModel.findByIdAndDelete(id).exec();
   }
 }

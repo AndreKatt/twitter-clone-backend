@@ -10,6 +10,7 @@ import { TweetController } from './tweet.controller';
 import { TweetService } from './tweet.service';
 import { TweetModel } from './tweet.model';
 import { UserService } from '../user/user.service';
+import { UserModel } from 'src/user/user.model';
 
 @Module({
   controllers: [TweetController],
@@ -19,6 +20,12 @@ import { UserService } from '../user/user.service';
         typegooseClass: TweetModel,
         schemaOptions: {
           collection: 'Tweet',
+        },
+      },
+      {
+        typegooseClass: UserModel,
+        schemaOptions: {
+          collection: 'User',
         },
       },
     ]),
