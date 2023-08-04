@@ -30,7 +30,7 @@ export class TweetService {
     return this.tweetModel.findById(id).exec();
   }
 
-  async findTweetByEmail(
+  async findTweetsByEmail(
     email: string,
   ): Promise<DocumentType<TweetModel>[] | null> {
     const tweets = (await this.tweetModel.find({}).exec()).filter(

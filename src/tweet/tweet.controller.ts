@@ -41,7 +41,7 @@ export class TweetController {
 
   @Get('byEmail/:email')
   async findByEmail(@Param('email') email: string) {
-    const userTweets = await this.tweetService.findTweetByEmail(email);
+    const userTweets = await this.tweetService.findTweetsByEmail(email);
     if (!userTweets) {
       throw new NotFoundException(TWEET_NOT_FOUD);
     }
