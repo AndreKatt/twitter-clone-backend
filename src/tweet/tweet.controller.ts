@@ -16,7 +16,6 @@ import {
 import { TweetService } from './tweet.service';
 import { CurrentUsername } from 'src/decorators/user-username.decorator copy';
 import { UserService } from 'src/user/user.service';
-import { USER_NOT_FOUND } from 'src/user/user.constants';
 
 @Controller('tweets')
 export class TweetController {
@@ -46,24 +45,6 @@ export class TweetController {
       throw new NotFoundException(TWEET_NOT_FOUD);
     }
     return userTweets;
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('byLikes')
-  async findByLikes(@CurrentUserEmail() email: string) {
-    const userData = await this.userService.findUserByEmail(email);
-
-    if (userData) {
-      const tweetsData = await Promise.all(
-        userData.likes.map(
-          async (id) => await this.tweetService.findTweetById(id),
-        ),
-      );
-
-      return tweetsData;
-    } else {
-      throw new NotFoundException(USER_NOT_FOUND);
-    }
   }
 
   @UseGuards(JwtAuthGuard)

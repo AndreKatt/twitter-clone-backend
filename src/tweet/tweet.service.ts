@@ -11,13 +11,11 @@ import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { FORBIDDEN_USER_EXCRPTION, TWEET_NOT_FOUD } from './tweet.constants';
 import { CreateTweetDto } from './dto/createTweet.dto';
 import { TweetModel } from './tweet.model';
-import { UserModel } from 'src/user/user.model';
 
 @Injectable()
 export class TweetService {
   constructor(
     @InjectModel(TweetModel) private readonly tweetModel: ModelType<TweetModel>,
-    @InjectModel(UserModel) private readonly userModel: ModelType<UserModel>,
     private readonly jwtService: JwtService,
   ) {}
 

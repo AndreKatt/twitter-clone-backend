@@ -5,12 +5,9 @@ import {
   HttpException,
   UnauthorizedException,
 } from '@nestjs/common/exceptions';
-import {
-  ModelType,
-  DocumentType,
-  BeAnObject,
-} from '@typegoose/typegoose/lib/types';
+import { ModelType, DocumentType } from '@typegoose/typegoose/lib/types';
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { Types } from 'mongoose';
 
 import { CreateUserDto } from './dto/createUser.dto';
 import { generateMD5 } from '../utils/generateHash';
@@ -25,7 +22,6 @@ import {
   USER_NOT_FOUND,
 } from './user.constants';
 import { CurrentUserDto } from './dto/currentUser.dto';
-import { ObjectId, Types } from 'mongoose';
 
 @Injectable()
 export class UserService {
