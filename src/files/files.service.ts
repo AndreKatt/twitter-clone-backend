@@ -3,7 +3,7 @@ import * as sharp from 'sharp';
 
 @Injectable()
 export class FilesService {
-  convertToWebP(file: Buffer): Promise<Buffer> {
-    return sharp(file).webp().toBuffer();
+  convertToWebP(files: Buffer[]): Promise<Buffer[]> {
+    return Promise.all(files.map((file) => sharp(file).webp().toBuffer()));
   }
 }

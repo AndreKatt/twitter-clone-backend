@@ -4,11 +4,11 @@ import {
   HttpException,
   HttpStatus,
   Post,
-  UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { FilesService } from './files.service';
 import { client } from 'src/configs/uploadcare.config';
@@ -19,19 +19,25 @@ export class FilesController {
 
   @Post('upload')
   @HttpCode(200)
-  // @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFiles(@UploadedFile() file: Express.Multer.File): Promise<void> {
-    const buffer = await this.filesService.convertToWebP(file.buffer);
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FilesInterceptor('files'))
+  async uploadFiles(
+    @UploadedFiles() files: Express.Multer.File[],
+  ): Promise<string[]> {
+    const buffer = await this.filesService.convertToWebP(
+      files.map((file) => file.buffer),
+    );
 
-    client
-      .uploadFile(buffer)
-      .then((file) => console.log(file.uuid))
+    const result = client
+      .uploadFileGroup(buffer)
+      .then((data) => data.files.map((file) => file.uuid))
       .catch((e) => {
         throw new HttpException(
           `Что-то пошло не так.... ${e}`,
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       });
+
+    return result;
   }
 }
