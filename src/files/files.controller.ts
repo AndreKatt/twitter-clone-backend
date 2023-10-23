@@ -20,7 +20,7 @@ export class FilesController {
   @Post('upload')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FilesInterceptor('files'))
+  @UseInterceptors(FilesInterceptor('file'))
   async uploadFiles(
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<string[]> {
@@ -30,7 +30,11 @@ export class FilesController {
 
     const result = client
       .uploadFileGroup(buffer)
-      .then((data) => data.files.map((file) => file.uuid))
+      .then((data) =>
+        data.files.map(
+          (file) => `${process.env.UPLOADCARE_STORE_URL}${file.uuid}`,
+        ),
+      )
       .catch((e) => {
         throw new HttpException(
           `Что-то пошло не так.... ${e}`,
