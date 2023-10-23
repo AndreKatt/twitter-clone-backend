@@ -32,7 +32,8 @@ export class FilesController {
       .uploadFileGroup(buffer)
       .then((data) =>
         data.files.map(
-          (file) => `${process.env.UPLOADCARE_STORE_URL}${file.uuid}`,
+          (file) =>
+            `${process.env.UPLOADCARE_STORE_URL}${file.uuid}/-/preview/`,
         ),
       )
       .catch((e) => {
