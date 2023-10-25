@@ -30,9 +30,9 @@ export class TweetService {
   async findTweetsByEmail(
     email: string,
   ): Promise<DocumentType<TweetModel>[] | null> {
-    const tweets = (await this.tweetModel.find({}).exec()).filter(
-      (tweet) => tweet.user.email === email,
-    );
+    const tweets = (
+      await this.tweetModel.find({}).sort({ createdAt: -1 }).exec()
+    ).filter((tweet) => tweet.user.email === email);
 
     return tweets;
   }
