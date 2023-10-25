@@ -16,6 +16,9 @@ export class UserModel extends TimeStamps {
   @prop({ unique: true, required: true })
   username: string;
 
+  @prop({ default: '' })
+  avatarUrl: string;
+
   @prop({ unique: true, required: true, select: false })
   passwordHash: string;
 
@@ -39,10 +42,4 @@ export class UserModel extends TimeStamps {
 
   // @prop({ default: [] })
   // replies: Reply[];
-
-  // @prop()
-  // location: string;
-
-  // @prop()
-  // about: string;
 }

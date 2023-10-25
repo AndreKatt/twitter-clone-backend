@@ -30,6 +30,7 @@ import {
 } from './user.constants';
 import { CreateUserDto } from './dto/createUser.dto';
 import { LoginUserDto } from './dto/loginUser.dto';
+import { SetAvatarDto } from './dto/setAvatar.dto';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { UserService } from './user.service';
 import { CurrentUserEmail } from 'src/decorators/user-email.decorator';
@@ -80,6 +81,7 @@ export class UserController {
   @Post('login')
   async login(@Body() dto: LoginUserDto) {
     const userData = await this.userService.loginUser(dto);
+
     if (userData) {
       const { email, fullname, username } = userData;
       const token = await this.userService.loginWithJWT(
@@ -96,7 +98,7 @@ export class UserController {
   @Patch('follow/:id')
   async follow(@Param('id') id: string, @CurrentUserEmail() email: string) {
     const isFollowing = await this.userService.findFollowing(id, email);
-    console.log(isFollowing);
+
     if (isFollowing) {
       throw new BadRequestException(ALREADY_FOLLOW_ERROR);
     } else {
@@ -116,9 +118,25 @@ export class UserController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('setAvatar/:id')
+  async setAvatar(@Param('id') id: string, @Body() dto: SetAvatarDto) {
+    const userData = await this.userService.updateUserData(
+      id,
+      'avatarUrl',
+      dto.avatarUrl,
+    );
+    if (userData) {
+      return userData;
+    } else {
+      throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+  }
+
   @Get('verify')
   async verify(@Query('hash') hash: string) {
     const verifyUser = await this.userService.verifyUserByHash(hash);
+
     if (!verifyUser) {
       throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
@@ -128,6 +146,7 @@ export class UserController {
   @Delete(':id')
   async delete(@Param('id') id: string) {
     const deletedUser = await this.userService.delete(id);
+
     if (!deletedUser) {
       throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }

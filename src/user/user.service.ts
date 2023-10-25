@@ -118,9 +118,9 @@ export class UserService {
   }
 
   async updateUserData(
-    id: Types.ObjectId,
-    type: 'following' | 'followers' | 'likes',
-    data: string[],
+    id: Types.ObjectId | string,
+    type: 'following' | 'followers' | 'likes' | 'avatarUrl',
+    data: string[] | string,
   ) {
     return this.userModel
       .findByIdAndUpdate(id, { [type]: data }, { new: true })
