@@ -1,25 +1,13 @@
 import { Types } from 'mongoose';
 import { prop } from '@typegoose/typegoose';
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
+// local libs
+import { TweetModel, TweetUser } from 'src/tweet/tweet.model';
 
-export class TweetUser {
-  @prop({ required: true })
-  email: string;
-
-  @prop({ required: true })
-  username: string;
-
-  @prop({ required: true })
-  fullname: string;
-
+export interface ReplyModel extends Base {}
+export class ReplyModel extends TimeStamps {
   @prop()
-  avatarUrl: string;
-}
-
-export interface TweetModel extends Base {}
-export class TweetModel extends TimeStamps {
-  @prop()
-  tweetId: Types.ObjectId;
+  replyId: Types.ObjectId;
 
   @prop({ required: true })
   text: string;

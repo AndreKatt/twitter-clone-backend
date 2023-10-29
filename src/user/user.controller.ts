@@ -34,7 +34,7 @@ import { SetAvatarDto } from './dto/setAvatar.dto';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { UserService } from './user.service';
 import { CurrentUserEmail } from 'src/decorators/user-email.decorator';
-import { CurrentUsername } from 'src/decorators/user-username.decorator copy';
+import { CurrentUsername } from 'src/decorators/user-username.decorator';
 import { CurrentUserFullname } from 'src/decorators/user-fullname.decorator';
 
 @Controller('user')

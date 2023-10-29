@@ -6,6 +6,7 @@ import { Controller, Get, Post, Delete, Patch } from '@nestjs/common';
 import { Body, Param, UseGuards } from '@nestjs/common/decorators';
 // local libs
 import { CurrentUserEmail } from 'src/decorators/user-email.decorator';
+import { CurrentUsername } from 'src/decorators/user-username.decorator';
 import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { CreateTweetDto } from './dto/createTweet.dto';
 import {
@@ -14,7 +15,6 @@ import {
   TWEET_NOT_FOUD,
 } from './tweet.constants';
 import { TweetService } from './tweet.service';
-import { CurrentUsername } from 'src/decorators/user-username.decorator copy';
 import { UserService } from 'src/user/user.service';
 
 @Controller('tweets')
@@ -50,17 +50,13 @@ export class TweetController {
   @UseGuards(JwtAuthGuard)
   @Post('addTweet')
   async create(@Body() dto: CreateTweetDto) {
-    return this.tweetService.create(dto);
+    return await this.tweetService.create(dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('like/:id')
   async like(@Param('id') id: string, @CurrentUserEmail() email: string) {
-    const alreadyLiked = await this.tweetService.findActionData(
-      id,
-      'likes',
-      email,
-    );
+    const alreadyLiked = await this.tweetService.findLike(id, email);
 
     if (alreadyLiked) {
       throw new BadRequestException(ALREADY_LIKED_ERROR);
@@ -74,11 +70,7 @@ export class TweetController {
   @UseGuards(JwtAuthGuard)
   @Patch('unlike/:id')
   async unlike(@Param('id') id: string, @CurrentUserEmail() email: string) {
-    const alreadyLiked = await this.tweetService.findActionData(
-      id,
-      'likes',
-      email,
-    );
+    const alreadyLiked = await this.tweetService.findLike(id, email);
 
     if (alreadyLiked) {
       await this.userService.changeLikes(id, 'unlike', email);
@@ -87,12 +79,6 @@ export class TweetController {
     } else {
       throw new BadRequestException(LIKE_NOT_FOUND);
     }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Patch('retweet/:id')
-  async retweet(@Param('id') id: string, @CurrentUserEmail() email: string) {
-    return this.tweetService.action(id, 'retweets', email);
   }
 
   @UseGuards(JwtAuthGuard)

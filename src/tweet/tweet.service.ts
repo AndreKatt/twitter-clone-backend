@@ -5,9 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
 import { ModelType, DocumentType } from '@typegoose/typegoose/lib/types';
-
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
-
+// local libs
 import { FORBIDDEN_USER_EXCRPTION, TWEET_NOT_FOUD } from './tweet.constants';
 import { CreateTweetDto } from './dto/createTweet.dto';
 import { TweetModel } from './tweet.model';
@@ -48,15 +47,11 @@ export class TweetService {
     return this.tweetModel.findByIdAndUpdate(id, dto, { new: true }).exec();
   }
 
-  async findActionData(
-    id: string,
-    type: 'likes' | 'retweets',
-    email: string,
-  ): Promise<boolean> {
+  async findLike(id: string, email: string): Promise<boolean> {
     const tweet = await this.tweetModel.findById(id).exec();
 
     if (tweet) {
-      return tweet[type].includes(email) ? true : false;
+      return tweet.likes.includes(email) ? true : false;
     } else {
       throw new NotFoundException(TWEET_NOT_FOUD);
     }
@@ -64,17 +59,15 @@ export class TweetService {
 
   async action(
     id: string,
-    type: 'likes' | 'retweets',
-    userEmail: string,
+    type: 'likes' | 'replies',
+    item: string,
     unlikeType?: boolean,
   ): Promise<DocumentType<TweetModel> | null> {
     const tweetData = await this.findTweetById(id);
 
     if (tweetData) {
       if (unlikeType) {
-        const updatedLikes = tweetData.likes.filter(
-          (email) => email !== userEmail,
-        );
+        const updatedLikes = tweetData.likes.filter((email) => email !== item);
         return this.tweetModel
           .findByIdAndUpdate(id, { likes: updatedLikes }, { new: true })
           .exec();
@@ -82,7 +75,7 @@ export class TweetService {
         return this.tweetModel
           .findByIdAndUpdate(
             id,
-            { [type]: [...tweetData[type], userEmail] },
+            { [type]: [...tweetData[type], item] },
             { new: true },
           )
           .exec();
@@ -100,6 +93,7 @@ export class TweetService {
     const tweet = await this.findTweetById(id);
     const tweetEmail = tweet?.user.email;
     const tweetUsername = tweet?.user.username;
+
     if (email) {
       if (email !== tweetEmail) {
         throw new ForbiddenException(FORBIDDEN_USER_EXCRPTION);

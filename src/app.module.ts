@@ -4,9 +4,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { getMongoConfig } from './configs/mongo.config';
 import { TweetModule } from './tweet/tweet.module';
-import { MediaModule } from './media/media.module';
 import { UserModule } from './user/user.module';
 import { FilesModule } from './files/files.module';
+import { ReplyModule } from './reply/reply.module';
 
 @Module({
   imports: [
@@ -18,8 +18,8 @@ import { FilesModule } from './files/files.module';
     }),
     UserModule,
     TweetModule,
-    MediaModule,
     FilesModule,
+    ReplyModule,
   ],
 })
 export class AppModule {}

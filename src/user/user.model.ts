@@ -36,10 +36,4 @@ export class UserModel extends TimeStamps {
 
   @prop({ default: [] })
   likes: string[];
-
-  // @prop({ default: [] })
-  // retweets: string[];
-
-  // @prop({ default: [] })
-  // replies: Reply[];
 }
