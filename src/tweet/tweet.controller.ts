@@ -16,12 +16,14 @@ import {
 } from './tweet.constants';
 import { TweetService } from './tweet.service';
 import { UserService } from 'src/user/user.service';
+import { ReplyService } from 'src/reply/reply.service';
 
 @Controller('tweets')
 export class TweetController {
   constructor(
     private readonly tweetService: TweetService,
     private readonly userService: UserService,
+    private readonly replyService: ReplyService,
   ) {}
 
   @Get('index')
@@ -114,6 +116,16 @@ export class TweetController {
     const verify = await this.tweetService.verify(id, email, username);
     if (!verify) {
       throw new NotFoundException(TWEET_NOT_FOUD);
+    }
+    const tweet = await this.tweetService.findTweetById(id);
+
+    if (tweet) {
+      tweet.likes.forEach(
+        async (email) =>
+          await this.userService.changeLikes(id, 'unlike', email),
+      );
+
+      tweet.replies.forEach(async (id) => await this.replyService.delete(id));
     }
     return this.tweetService.delete(id);
   }
