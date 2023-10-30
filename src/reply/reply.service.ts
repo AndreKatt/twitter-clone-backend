@@ -28,6 +28,14 @@ export class ReplyService {
     return Promise.all(replies.map((id) => this.findReplyById(id)));
   }
 
+  async findByUserEmail(
+    email: string,
+  ): Promise<(DocumentType<ReplyModel> | null)[]> {
+    const replies = await this.index();
+
+    return replies.filter((reply) => reply.user.email === email);
+  }
+
   async create(dto: CreateReplyDto): Promise<DocumentType<ReplyModel>> {
     return this.replyModel.create(dto);
   }

@@ -6,6 +6,7 @@ import { ReplyService } from './reply.service';
 import { TweetService } from 'src/tweet/tweet.service';
 import { TWEET_NOT_FOUD } from 'src/tweet/tweet.constants';
 import { REPLY_NOT_FOUD } from './reply.constants';
+import { USER_NOT_FOUND } from 'src/user/user.constants';
 import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { CurrentUserEmail } from 'src/decorators/user-email.decorator';
 import { CurrentUsername } from 'src/decorators/user-username.decorator';
@@ -49,6 +50,16 @@ export class ReplyController {
     } else {
       throw new NotFoundException(TWEET_NOT_FOUD);
     }
+  }
+
+  @Get('byUser/:email')
+  async findByUser(@Param('email') email: string) {
+    const findReplies = await this.replyService.findByUserEmail(email);
+
+    if (!findReplies) {
+      throw new NotFoundException(USER_NOT_FOUND);
+    }
+    return findReplies;
   }
 
   @UseGuards(JwtAuthGuard)
