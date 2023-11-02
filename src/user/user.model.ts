@@ -19,6 +19,9 @@ export class UserModel extends TimeStamps {
   @prop({ default: '' })
   avatarUrl: string;
 
+  @prop({ default: '' })
+  profileImageUrl: string;
+
   @prop({ unique: true, required: true, select: false })
   passwordHash: string;
 

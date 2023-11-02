@@ -119,7 +119,7 @@ export class UserService {
 
   async updateUserData(
     id: Types.ObjectId | string,
-    type: 'following' | 'followers' | 'likes' | 'avatarUrl',
+    type: 'following' | 'followers' | 'likes' | 'avatarUrl' | 'profileImageUrl',
     data: string[] | string,
   ) {
     return this.userModel

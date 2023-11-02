@@ -30,7 +30,7 @@ import {
 } from './user.constants';
 import { CreateUserDto } from './dto/createUser.dto';
 import { LoginUserDto } from './dto/loginUser.dto';
-import { SetAvatarDto } from './dto/setAvatar.dto';
+import { SetImageDto } from './dto/setImage.dto';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { UserService } from './user.service';
 import { CurrentUserEmail } from 'src/decorators/user-email.decorator';
@@ -120,11 +120,26 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('setAvatar/:id')
-  async setAvatar(@Param('id') id: string, @Body() dto: SetAvatarDto) {
+  async setAvatar(@Param('id') id: string, @Body() dto: SetImageDto) {
     const userData = await this.userService.updateUserData(
       id,
       'avatarUrl',
-      dto.avatarUrl,
+      dto.imageUrl,
+    );
+    if (userData) {
+      return userData;
+    } else {
+      throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('setProfileImage/:id')
+  async setProfileImage(@Param('id') id: string, @Body() dto: SetImageDto) {
+    const userData = await this.userService.updateUserData(
+      id,
+      'profileImageUrl',
+      dto.imageUrl,
     );
     if (userData) {
       return userData;
